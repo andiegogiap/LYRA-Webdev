@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SDK Explorer</title>
+    <link rel="stylesheet" href="index.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "marked": "https://esm.sh/marked@^15.0.8",
+          "@google/genai": "https://esm.sh/@google/genai",
+          "jszip": "https://esm.sh/jszip@3.10.1"
+        }
+      }
+    </script>
+    <script type="module" src="index.tsx"></script>
+    <link rel="icon" href="https://andiegogiap.com/assets/favicon.ico" sizes="any">
+  </head>
+  <body>
+    <div id="app-container">
+      <nav id="sidebar">
+        <div class="sidebar-header">
+          <a href="/" aria-label="Home" class="brand-link sidebar-title-text">
+            <img
+              src="https://andiegogiap.com/assets/aionex-icon-256.png"
+              alt="AIONEX"
+              width="128" height="128"
+              style="height:40px;width:auto;display:block"
+              loading="eager" decoding="async"
+            />
+          </a>
+          <button id="collapse-btn" aria-label="Collapse sidebar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11 17L6 12L11 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M18 17L13 12L18 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <ul id="nav-links">
+          <!-- Links will be populated by JS -->
+        </ul>
+      </nav>
+      <div id="resize-handle"></div>
+      <div id="main-and-bookmarks-wrapper">
+        <main id="content-area">
+          <div id="web-dev-assistant-page" class="page">
+              <header>
+                <div class="header-main">
+                  <h1>WebDev Assistant</h1>
+                  <p>Your AI partner for modern web development, powered by Gemini with Google Search.</p>
+                </div>
+                <button id="toggle-bookmarks-btn" title="Toggle Bookmarks Panel">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path></svg>
+                  <span class="badge" id="bookmarks-count">0</span>
+                </button>
+              </header>
+              <form id="prompt-form">
+                <input 
+                  type="text" 
+                  id="prompt-input" 
+                  name="prompt" 
+                  placeholder="e.g., What's new in Next.js 14?" 
+                  required 
+                  aria-label="Web development question"
+                />
+                <button type="submit" id="submit-button">
+                  <span class="button-text">Ask Gemini</span>
+                  <div class="spinner" id="spinner" style="display: none;"></div>
+                </button>
+              </form>
+              <section id="result-container" aria-live="polite">
+                <!-- Action buttons will be injected here -->
+                <div id="response-content"></div>
+                <div id="sources-container"></div>
+              </section>
+          </div>
+          <div id="web-dev-studio-page" class="page">
+              <div id="studio-content-wrapper">
+                <div id="studio-project-panel">
+                    <div class="studio-project-files">
+                      <div class="studio-project-files-header">
+                        <div class="header-left">
+                           <h2>Project Files</h2>
+                           <p id="studio-container-status">No active container.</p>
+                        </div>
+                        <div id="studio-file-toolbar">
+                           <!-- Toolbar will be injected here -->
+                        </div>
+                      </div>
+                      <ul id="studio-file-list">
+                          <li class="empty-state">Select a container and build a project.</li>
+                      </ul>
+                    </div>
+                    <div id="studio-editor-panel">
+                        <div id="studio-tab-bar">
+                           <!-- Tabs will be rendered here -->
+                        </div>
+                        <div class="studio-editor-header">
+                            <div id="studio-editor-tabs">
+                                <button id="editor-tab-btn" class="active">Editor</button>
+                                <button id="preview-tab-btn">Preview</button>
+                            </div>
+                            <span id="studio-active-file-name">No file selected</span>
+                        </div>
+                        <div id="studio-editor-content">
+                            <textarea id="studio-code-editor" spellcheck="false"></textarea>
+                            <div id="preview-wrapper">
+                                <iframe id="preview-frame" title="Live Preview of the generated website"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+          </div>
+          <div id="crewai-orchestrator-page" class="page">
+            <header>
+              <div class="header-main">
+                <h1>CrewAI Orchestrator</h1>
+                <p>Define a high-level task and watch your specialized AI crew execute it step-by-step.</p>
+              </div>
+            </header>
+            <form id="crew-form">
+                <textarea id="crew-input" placeholder="Enter a complex task, e.g., 'Validate new user data, post it to the onboarding API, and report the outcome.'" rows="3" required></textarea>
+                <button type="submit" id="crew-run-button">
+                    <span class="button-text">Run Crew</span>
+                    <div class="spinner" id="crew-spinner" style="display: none;"></div>
+                </button>
+            </form>
+            <section id="crew-progress-panel">
+                <!-- Agent progress steps will be rendered here by JS -->
+            </section>
+          </div>
+          <div id="docs-page" class="page">
+            <div id="docs-header">
+               <!-- Title and install button will be populated here by JS -->
+            </div>
+            <div id="docs-content"></div>
+          </div>
+          <div id="commands-page" class="page">
+            <h1 id="commands-title"></h1>
+            <div id="commands-content-wrapper">
+              <div id="commands-content"></div>
+            </div>
+          </div>
+          <div id="file-explorer-page" class="page">
+              <h1>File Explorer</h1>
+              <div class="containers-layout">
+                  <aside class="containers-list-panel">
+                      <form id="create-container-form">
+                          <input type="text" id="container-name-input" placeholder="New container name..." required />
+                          <select id="container-template-select" aria-label="Container Peering Client Template"></select>
+                          <button type="submit">Create</button>
+                      </form>
+                      <ul id="containers-list"></ul>
+                  </aside>
+                  <section class="file-explorer-panel">
+                      <div class="file-explorer-header">
+                          <div class="file-explorer-header-left">
+                            <h2 id="file-explorer-title">Select a Container</h2>
+                            <div id="file-explorer-toolbar">
+                                <!-- Toolbar buttons will be injected here -->
+                            </div>
+                          </div>
+                          <div class="view-toggle">
+                            <button id="list-view-btn" class="active" title="List View"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg></button>
+                            <button id="table-view-btn" title="Table View"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg></button>
+                          </div>
+                      </div>
+                      <div id="file-list-view-wrapper">
+                        <ul id="file-explorer-list"></ul>
+                      </div>
+                      <div id="file-table-view-wrapper" class="hidden">
+                        <table id="file-table-view">
+                            <thead>
+                                <tr>
+                                    <th data-sort="name">Name</th>
+                                    <th data-sort="description">Description</th>
+                                    <th data-sort="author">Author</th>
+                                    <th data-sort="modifiedAt">Last Modified</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                      </div>
+                      <div class="installed-tools-panel">
+                        <h3>Installed Tools</h3>
+                        <ul id="installed-tools-list">
+                            <!-- list will be populated by JS -->
+                        </ul>
+                      </div>
+                  </section>
+              </div>
+          </div>
+        </main>
+        <aside id="bookmarks-panel" class="collapsed">
+          <div class="bookmarks-header">
+            <h3>Bookmarked Inferences</h3>
+            <button id="close-bookmarks-btn" aria-label="Close Bookmarks">&times;</button>
+          </div>
+          <ul id="bookmarks-list">
+            <!-- Bookmarks will be populated by JS -->
+          </ul>
+        </aside>
+      </div>
+    </div>
+
+    <footer id="terminal-console">
+        <div id="terminal-header">
+            <span id="cli-title">
+                <!-- Icon will be injected here by JS -->
+                GEMINI CLI
+            </span>
+             <div class="terminal-controls">
+                <span id="terminal-path"></span>
+                <button id="toggle-terminal-btn" aria-label="Toggle terminal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                </button>
+            </div>
+        </div>
+        <div id="terminal-output"></div>
+        <form id="terminal-form">
+            <span id="terminal-prompt">$</span>
+            <input type="text" id="terminal-input" autocomplete="off" disabled/>
+        </form>
+    </footer>
+
+    <!-- Env Editor Modal -->
+    <div id="env-editor-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-content">
+        <h3>Edit <code id="env-editor-filename"></code></h3>
+        <div id="env-editor-fields">
+          <!-- Key-value pairs will be injected here -->
+        </div>
+        <button id="add-env-var-btn">Add Variable</button>
+        <div class="modal-actions">
+          <button id="env-editor-cancel-btn">Cancel</button>
+          <button id="env-editor-save-btn">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command Suggestion Modal -->
+    <div id="command-suggestion-modal" class="modal-backdrop" style="display: none;">
+      <div class="modal-content">
+        <h3 id="suggestion-command-name"></h3>
+        <div id="suggestion-content" class="modal-body"></div>
+        <div class="modal-actions">
+          <button id="suggestion-close-btn">Close</button>
+          <button id="suggestion-use-btn">Run Command</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden file inputs for uploads -->
+    <input type="file" id="file-upload-input" style="display: none;" multiple />
+    <input type="file" id="folder-upload-input" style="display: none;" webkitdirectory directory />
+
+  </body>
+</html>

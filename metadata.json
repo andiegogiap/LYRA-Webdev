@@ -1,0 +1,6 @@
+{
+  "name": "Copy of LYRA connector to OpenAI SDK Explorer",
+  "description": "A technical explorer for OpenAI SDK modules, including a Gemini-powered assistant.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
