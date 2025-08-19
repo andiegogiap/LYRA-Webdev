@@ -837,6 +837,10 @@ pre code .token.attr-value { color: #a5d6a7; }
   flex-shrink: 0;
 }
 
+.header-left {
+  min-width: 0;
+}
+
 .header-left h2 {
   margin: 0;
   font-size: 1.2rem;
@@ -856,7 +860,7 @@ pre code .token.attr-value { color: #a5d6a7; }
   display: flex;
   gap: 0.5rem;
 }
-#studio-file-toolbar button {
+#studio-file-toolbar button, .open-terminal-btn {
   background: none;
   border: 1px solid transparent;
   color: var(--text-muted-color);
@@ -868,15 +872,15 @@ pre code .token.attr-value { color: #a5d6a7; }
   justify-content: center;
   transition: all 0.2s;
 }
-#studio-file-toolbar button:hover:not(:disabled) {
+#studio-file-toolbar button:hover:not(:disabled), .open-terminal-btn:hover:not(:disabled) {
   background-color: var(--code-bg-color);
   color: var(--text-color);
 }
-#studio-file-toolbar button:disabled {
+#studio-file-toolbar button:disabled, .open-terminal-btn:disabled {
   color: #666;
   cursor: not-allowed;
 }
-#studio-file-toolbar button svg {
+#studio-file-toolbar button svg, .open-terminal-btn svg {
   width: 20px;
   height: 20px;
 }
@@ -1311,6 +1315,13 @@ pre code .token.attr-value { color: #a5d6a7; }
   flex-shrink: 0;
 }
 
+.file-explorer-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
 .file-explorer-header h2 {
   margin: 0;
   font-size: 1.2rem;
@@ -1486,6 +1497,172 @@ pre code .token.attr-value { color: #a5d6a7; }
   height: 20px;
   color: var(--neon-teal);
   flex-shrink: 0;
+}
+
+/* === Instances Page === */
+#instances-page header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.instances-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.instance-card {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.instance-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    border-color: var(--primary-color);
+}
+
+.instance-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.instance-card-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.instance-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.instance-status.running span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--success-color);
+    box-shadow: 0 0 8px var(--success-color);
+}
+
+.instance-card-body {
+    padding: 1.25rem;
+    flex-grow: 1;
+}
+
+.instance-card-body p {
+    margin: 0 0 0.75rem 0;
+    color: var(--text-muted-color);
+    font-size: 0.9rem;
+}
+
+.instance-card-body p strong {
+    color: var(--text-color);
+}
+.instance-card-body .expiration.expiring-soon {
+    color: var(--error-color);
+    font-weight: 500;
+}
+
+.installed-tools-summary {
+    font-size: 0.9rem;
+}
+
+.installed-tools-summary strong {
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+      display: block;
+}
+
+.tools-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.tool-tag {
+    background-color: var(--code-bg-color);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.tool-tag svg {
+    width: 18px;
+    height: 18px;
+    color: var(--neon-teal);
+}
+.tools-list span {
+    color: var(--text-muted-color);
+    font-style: italic;
+}
+
+
+.instance-card-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--code-bg-color);
+}
+
+.instance-card-actions button {
+    flex-grow: 1;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border-color);
+    background: var(--surface-color);
+    color: var(--text-muted-color);
+    font-weight: 500;
+}
+.instance-card-actions button:hover {
+    color: var(--text-color);
+    border-color: var(--text-muted-color);
+}
+.instance-card-actions .connect-instance-btn {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.instance-card-actions .connect-instance-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+.instance-card-actions .terminal-instance-btn {
+    color: var(--neon-teal);
+    border-color: var(--neon-teal);
+}
+.instance-card-actions .terminal-instance-btn:hover {
+    background-color: var(--neon-teal);
+    color: var(--background-color);
+}
+.instance-card-actions .delete-instance-btn {
+    color: var(--error-color);
+    border-color: var(--error-color);
+}
+.instance-card-actions .delete-instance-btn:hover {
+    background-color: var(--error-color);
+    color: white;
 }
 
 /* === Bookmarks Panel === */
@@ -2251,4 +2428,20 @@ pre code .token.attr-value { color: #a5d6a7; }
   margin-top: 2.5rem;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.5);
+}
+
+.empty-state {
+  color: var(--text-muted-color);
+  font-style: italic;
+  font-family: inherit;
+  cursor: default;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+.empty-state blockquote {
+  margin: 0;
 }

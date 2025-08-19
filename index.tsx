@@ -267,10 +267,12 @@ const ICONS: Record<string, string> = {
   'agent-lyra': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>`,
   'agent-kara': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>`,
   'agent-cecilia': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+  'instances': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>`,
+  'terminal': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>`,
 };
 
 // --- Type Definitions ---
-type ModuleType = 'assistant' | 'docs' | 'commands' | 'explorer' | 'studio' | 'orchestrator';
+type ModuleType = 'assistant' | 'docs' | 'commands' | 'explorer' | 'studio' | 'orchestrator' | 'instances';
 
 interface Module {
   title: string;
@@ -346,6 +348,11 @@ const modules: Record<string, Module> = {
   'file-explorer': {
     title: 'File Explorer',
     type: 'explorer',
+    content: null,
+  },
+  'instances': {
+    title: 'Instances',
+    type: 'instances',
     content: null,
   },
   'crewai-orchestrator': {
@@ -588,6 +595,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const sidebar = document.getElementById('sidebar') as HTMLElement;
   const resizeHandle = document.getElementById('resize-handle') as HTMLDivElement;
   const collapseBtn = document.getElementById('collapse-btn') as HTMLButtonElement;
+  const contentArea = document.getElementById('content-area') as HTMLElement;
 
   // Page Elements
   const navLinksContainer = document.getElementById('nav-links') as HTMLUListElement;
@@ -595,6 +603,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const webDevAssistantPage = document.getElementById('web-dev-assistant-page') as HTMLDivElement;
   const webDevStudioPage = document.getElementById('web-dev-studio-page') as HTMLDivElement;
   const fileExplorerPage = document.getElementById('file-explorer-page') as HTMLDivElement;
+  const instancesPage = document.getElementById('instances-page') as HTMLDivElement;
   const crewaiOrchestratorPage = document.getElementById('crewai-orchestrator-page') as HTMLDivElement;
   const docsPage = document.getElementById('docs-page') as HTMLDivElement;
   const docsHeader = document.getElementById('docs-header') as HTMLDivElement;
@@ -687,7 +696,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function populateNavLinks() {
     navLinksContainer.innerHTML = '';
     const groupedModules = {
-      'Main': ['web-dev-assistant', 'web-dev-studio', 'file-explorer', 'crewai-orchestrator', 'command-palette'],
+      'Main': ['web-dev-assistant', 'web-dev-studio', 'file-explorer', 'instances', 'crewai-orchestrator', 'command-palette'],
       'APIs': ['assistants-api', 'code-interpreter', 'remote-mcp', 'computer-use', 'vector-stores', 'menus-api']
     };
 
@@ -788,6 +797,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <button id="add-folder-btn" title="New Folder">${ICONS['folder-plus']}</button>
         <button id="upload-file-btn" title="Upload Files">${ICONS['upload']}</button>
         <button id="download-zip-btn" title="Download as ZIP">${ICONS['download']}</button>
+        <button class="open-terminal-btn" title="Open Terminal">${ICONS['terminal']}</button>
         <button id="refresh-files-btn" title="Refresh">${ICONS['refresh']}</button>
       `;
       fileExplorerToolbar.innerHTML = toolbarButtons;
@@ -809,7 +819,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
 
-  function renderDocsPage(moduleId: string) {
+  async function renderDocsPage(moduleId: string) {
     const module = modules[moduleId];
     if (!module || !module.content) {
       docsContent.innerHTML = '<p>Documentation not available.</p>';
@@ -826,7 +836,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <h1 id="docs-title">${module.title}</h1>
         ${installButton}
     `;
-    docsContent.innerHTML = marked.parse(module.content);
+    docsContent.innerHTML = await marked.parse(module.content);
   }
 
   function renderCommandsPage() {
@@ -894,8 +904,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     crewProgressPanel.innerHTML = agentMarkup;
   }
   
+  async function renderInstancesPage() {
+    const containers = await db.getAllContainers();
+    const instancesContent = document.getElementById('instances-content') as HTMLDivElement;
+    if (containers.length === 0) {
+        instancesContent.innerHTML = `<div class="empty-state"><blockquote>No active instances. Create one in the File Explorer.</blockquote></div>`;
+        return;
+    }
+
+    instancesContent.innerHTML = containers.map(c => {
+        const expires = new Date(c.expiresAt);
+        const now = new Date();
+        const diffTime = Math.abs(expires.getTime() - now.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const isExpiringSoon = diffDays <= 2;
+        const expirationText = `Expires in ${diffDays} day(s)`;
+
+        return `
+        <div class="instance-card" data-container-id="${c.id}">
+            <div class="instance-card-header">
+                <h3>${c.name}</h3>
+                <div class="instance-status running">
+                    <span></span> Running
+                </div>
+            </div>
+            <div class="instance-card-body">
+                <p><strong>Created:</strong> ${formatDate(c.createdAt)}</p>
+                <p class="expiration ${isExpiringSoon ? 'expiring-soon' : ''}"><strong>Expiration:</strong> ${formatDate(c.expiresAt)} (${expirationText})</p>
+                <div class="installed-tools-summary">
+                    <strong>Tools:</strong>
+                    <div class="tools-list">
+                        ${c.installedTools.length > 0 ? c.installedTools.map(toolId => `<div class="tool-tag" title="${modules[toolId]?.title || toolId}">${ICONS[toolId] || ''}</div>`).join('') : '<span>None</span>'}
+                    </div>
+                </div>
+            </div>
+            <div class="instance-card-actions">
+                <button class="connect-instance-btn">Connect</button>
+                <button class="terminal-instance-btn">Terminal</button>
+                <button class="delete-instance-btn">Delete</button>
+            </div>
+        </div>
+        `;
+    }).join('');
+  }
+
   // --- Navigation ---
-  function navigateTo(moduleId: string) {
+  async function navigateTo(moduleId: string) {
     allPages.forEach(p => p.classList.remove('active'));
     document.querySelectorAll('#nav-links a').forEach(a => a.classList.remove('active'));
 
@@ -905,10 +959,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if (module.type === 'docs') {
       page = docsPage;
-      renderDocsPage(moduleId);
+      await renderDocsPage(moduleId);
     } else if (module.type === 'commands') {
       page = commandsPage;
       renderCommandsPage();
+    } else if (module.type === 'instances') {
+        page = instancesPage;
+        await renderInstancesPage();
     }
     
     if (page) {
@@ -924,12 +981,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // --- Event Handlers ---
-  function handleNavLinkClick(e: Event) {
+  async function handleNavLinkClick(e: Event) {
     const target = e.target as HTMLElement;
     const link = target.closest('a');
     if (link && link.dataset.moduleId) {
       e.preventDefault();
-      navigateTo(link.dataset.moduleId);
+      await navigateTo(link.dataset.moduleId);
     }
   }
 
@@ -962,7 +1019,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           .map((chunk: any) => chunk.web)
           .filter((web: any) => web && web.uri);
 
-      const responseHtml = marked.parse(text);
+      const responseHtml = await marked.parse(text);
       responseContent.innerHTML = responseHtml;
       
       if (sources.length > 0) {
@@ -1038,7 +1095,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const resultText = response.text;
             context = resultText; // Pass the output as context to the next agent
             
-            outputElement.innerHTML = marked.parse(resultText);
+            outputElement.innerHTML = await marked.parse(resultText);
             (outputElement as HTMLElement).style.display = 'block';
 
             stepElement.classList.remove('working');
@@ -1087,8 +1144,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     bookmarksPanel.classList.toggle('collapsed', isBookmarksPanelCollapsed);
   }
 
-  function toggleTerminal() {
-    isTerminalCollapsed = !isTerminalCollapsed;
+  function toggleTerminal(forceCollapse?: boolean) {
+    isTerminalCollapsed = forceCollapse !== undefined ? forceCollapse : !isTerminalCollapsed;
     terminalConsole.classList.toggle('collapsed', isTerminalCollapsed);
     document.body.classList.toggle('terminal-collapsed', isTerminalCollapsed);
   }
@@ -1202,7 +1259,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set initial page
     const lastPage = await db.getValue('lastPage');
     const initialModuleId = window.location.hash.substring(1) || lastPage || 'web-dev-assistant';
-    navigateTo(initialModuleId);
+    await navigateTo(initialModuleId);
 
     // Sidebar
     collapseBtn.addEventListener('click', handleSidebarCollapse);
@@ -1217,7 +1274,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     closeBookmarksBtn.addEventListener('click', toggleBookmarksPanel);
     bookmarksList.addEventListener('click', async (e) => {
         const target = e.target as HTMLElement;
-        const item = target.closest('.bookmark-item');
+        const item = target.closest('.bookmark-item') as HTMLElement;
         if (!item) return;
 
         const bookmarkId = item.dataset.bookmarkId!;
@@ -1228,7 +1285,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             item.querySelector('.bookmark-item-body')?.classList.toggle('expanded');
         } else if (target.classList.contains('run-btn')) {
             input.value = bookmark.prompt;
-            navigateTo('web-dev-assistant');
+            await navigateTo('web-dev-assistant');
             form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
         } else if (target.classList.contains('delete-btn')) {
             await db.deleteBookmark(bookmarkId);
@@ -1259,12 +1316,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Instances Page
+    instancesPage.addEventListener('click', async (e) => {
+        const target = e.target as HTMLElement;
+        const card = target.closest('.instance-card') as HTMLElement;
+        if (!card) return;
+
+        const containerId = card.dataset.containerId!;
+
+        if (target.classList.contains('connect-instance-btn')) {
+            await loadContainer(containerId);
+            await navigateTo('file-explorer');
+        } else if (target.classList.contains('terminal-instance-btn')) {
+            await loadContainer(containerId);
+            await navigateTo('file-explorer');
+            toggleTerminal(false);
+            terminalInput.focus();
+        } else if (target.classList.contains('delete-instance-btn')) {
+            if (confirm('Are you sure you want to delete this instance? This action cannot be undone.')) {
+                await db.deleteContainer(containerId);
+                if (activeContainerId === containerId) {
+                    activeContainerId = null;
+                    activeContainer = null;
+                    await db.saveValue('activeContainerId', null);
+                    updateExplorerAndStudioViews();
+                }
+                await renderInstancesPage();
+                await renderContainersList(); // Refresh list in file explorer too
+            }
+        }
+    });
+    
+    // Toolbar buttons
+    contentArea.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const button = target.closest('.open-terminal-btn');
+        if (button) {
+            toggleTerminal(false);
+            terminalInput.focus();
+        }
+    });
+
+
     // CrewAI Orchestrator
     crewForm.addEventListener('submit', handleCrewFormSubmit);
     renderCrewOrchestrator();
 
     // Terminal
-    toggleTerminalBtn.addEventListener('click', toggleTerminal);
+    toggleTerminalBtn.addEventListener('click', () => toggleTerminal());
     terminalForm.addEventListener('submit', handleTerminalCommand);
 
     // Editor / Studio
@@ -1297,7 +1396,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     [fileExplorerList, studioFileList].forEach(list => {
-      list.addEventListener('click', (e) => {
+      list.addEventListener('click', async (e) => {
         const li = (e.target as HTMLElement).closest('li');
         if (!li || !li.dataset.fileId || !activeContainer) return;
         const fileId = li.dataset.fileId;
@@ -1315,7 +1414,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
               previewFrame.srcdoc = '';
             }
-            navigateTo('web-dev-studio');
+            await navigateTo('web-dev-studio');
           } else if (node.type === 'directory') {
             // Handle directory navigation for file explorer
             if (list === fileExplorerList) {
